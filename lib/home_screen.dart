@@ -24,12 +24,17 @@ class HomeScreen extends StatelessWidget {
           onPressed: () async {
             final String atSignPico = "@distinctiveblue";
             final String key = "test";
+
             AtClientManager atClientManager = AtClientManager.getInstance();
             final AtClient atClient = atClientManager.atClient;
-            final AtKey atKey = AtKey.public(key, namespace: "group5", sharedBy: atSignPico).build();
-            // final AtValue atValue = await atClient.get(atKey);
+            // final AtKey atKey = AtKey.public(key, namespace: "group5", sharedBy: atSignPico).build();
+            // final AtKey atKey = AtKey.public(key, sharedBy: atSignPico).build();
+            final AtKey atKey = AtKey.public(key, sharedBy: atSignPico).build();
+
+            print(atKey);
+            final AtValue atValue = await atClient.get(atKey);
             // final String value = atValue.value;
-            print("test!");
+            // print("test!");
 
 
           },
