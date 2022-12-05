@@ -33,6 +33,7 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Test'),
       ),
       body: Center(
+<<<<<<< HEAD
           child: [ElevatedButton(
             onPressed: getWeather,
             child: const Text("Get weather!"),
@@ -42,6 +43,28 @@ class HomeScreen extends StatelessWidget {
               child: Text('$temp'),
             )
           ]
+=======
+        child: ElevatedButton(
+          onPressed: () async {
+            final String atSignPico = "@distinctiveblue";
+            final String key = "test";
+
+            AtClientManager atClientManager = AtClientManager.getInstance();
+            final AtClient atClient = atClientManager.atClient;
+            // final AtKey atKey = AtKey.public(key, namespace: "group5", sharedBy: atSignPico).build();
+            // final AtKey atKey = AtKey.public(key, sharedBy: atSignPico).build();
+            final AtKey atKey = AtKey.public(key, sharedBy: atSignPico).build();
+
+            print(atKey);
+            final AtValue atValue = await atClient.get(atKey);
+            // final String value = atValue.value;
+            // print("test!");
+
+
+          },
+          child: const Text("Test!"),
+        )
+>>>>>>> cfb47fdfb90cd68d904bda526f55dec9fbcf1f23
       ),
     );
   }
