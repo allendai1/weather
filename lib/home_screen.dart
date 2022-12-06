@@ -5,66 +5,124 @@ import 'package:at_app_flutter/at_app_flutter.dart' show AtEnv;
 import 'package:at_utils/at_logger.dart' show AtSignLogger;
 import 'package:path_provider/path_provider.dart'
     show getApplicationSupportDirectory;
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+
 
 // * Once the onboarding process is completed you will be taken to this screen
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget  {
   const HomeScreen({Key? key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() => _HomeScreenState();
+
+
+  void initState(){
+
+  }
+
+
+}
+
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin{
+  String temperature = "";
+  String humidity = "";
+  int counter = 0;
+  final String atSignPico = "@distinctiveblue";
+  final String key = "temperature";
+  AtClientManager atClientManager = AtClientManager.getInstance();
+  Timer? timer;
+
+  late AnimationController controller;
+
+  void getWeather() async {
+    final AtClient atClient = atClientManager.atClient;
+    final AtKey atKey = AtKey.public(
+        key, namespace: "group5", sharedBy: atSignPico).build();
+
+    GetRequestOptions options = GetRequestOptions();
+    options.bypassCache = true;
+    AtValue atValue = await atClient.get(atKey, getRequestOptions: options);
+    final String value = atValue.value;
+
+    setState(() {
+      temperature = value.split(",")[0];
+      humidity = value.split(",")[1];
+    });
+
+  }
+
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 9),
+    )..addListener(() {
+      setState(() {});
+    });
+    controller.repeat();
+
+    // controller.repeat(reverse: true);
+
+    timer = Timer.periodic(Duration(seconds: 2), (Timer t) {
+      getWeather();
+      // setState((){
+      //   counter++;
+      // });
+
+    });
+    controller.repeat();
+
+
+
+
+  }
+  @override
+  void dispose() {
+    timer?.cancel();
+    controller.dispose();
+    super.dispose();
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
     // * Getting the AtClientManager instance to use below
-    final String atSignPico = "@distinctiveblue";
-    final String key = "temperature";
-    AtClientManager atClientManager = AtClientManager.getInstance();
-    final AtClient atClient = atClientManager.atClient;
-    final AtKey atKey = AtKey.public(
-        key, namespace: "group5", sharedBy: atSignPico).build();
-    int temp;
 
-    void getWeather() async {
-      GetRequestOptions options = GetRequestOptions();
-      options.bypassCache = true;
-      AtValue atValue = await atClient.get(atKey, getRequestOptions: options);
-      final String value = atValue.value;
-      print(value);
-    }
+
+
+
+
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Test'),
+        title: const Text('Weather'),
       ),
       body: Center(
-<<<<<<< HEAD
-          child: [ElevatedButton(
-            onPressed: getWeather,
-            child: const Text("Get weather!"),
-          ),
-            SizedBox(
-              width: 18,
-              child: Text('$temp'),
-            )
-          ]
-=======
-        child: ElevatedButton(
-          onPressed: () async {
-            final String atSignPico = "@distinctiveblue";
-            final String key = "test";
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-            AtClientManager atClientManager = AtClientManager.getInstance();
-            final AtClient atClient = atClientManager.atClient;
-            // final AtKey atKey = AtKey.public(key, namespace: "group5", sharedBy: atSignPico).build();
-            // final AtKey atKey = AtKey.public(key, sharedBy: atSignPico).build();
-            final AtKey atKey = AtKey.public(key, sharedBy: atSignPico).build();
+                // ElevatedButton(
+                //   onPressed: getWeather,
+                //   child: const Text("Get weather!"),
+                // ),
+                // Text('timer $counter'),
+                Text('temperature: $temperature F'),
+                Text('humidity: $humidity %'),
+                LinearProgressIndicator(
+                  value: controller.value,
+                  semanticsLabel: 'Linear progress indicator',
+                ),
 
-            print(atKey);
-            final AtValue atValue = await atClient.get(atKey);
-            // final String value = atValue.value;
-            // print("test!");
+              ]
+          )
 
 
-          },
-          child: const Text("Test!"),
-        )
->>>>>>> cfb47fdfb90cd68d904bda526f55dec9fbcf1f23
+
       ),
     );
   }
